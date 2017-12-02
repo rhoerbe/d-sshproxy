@@ -1,0 +1,3 @@
+# SSH Proxy
+
+Docker container to run a SSH daemon as a proxy, e.g. as a SOCKS proxy

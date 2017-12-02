@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+main() {
+    SCRIPTDIR=$(cd $(dirname $BASH_SOURCE[0]) && pwd)
+    source $SCRIPTDIR/dscripts/conf_lib.sh  $@         # load library functions
+    configlib_version=2  # compatible version of conf_lib.sh
+    check_version $configlib_version
+    # do_not_build $@ # uncomment this line to pull/load image
+    init_sudo
+    _set_volume_root
+    _set_image_and_container_name
+    _set_users
+    _set_buildargs
+    _set_run_args
+    _set_logfiles
+}
+
+
+_set_volume_root() {
+    # container volumes mounted to host paths, or symlinks to docker volumes
+    DOCKERVOL_SHORT='./dv';
+    DOCKERLOG_SHORT='./dl';
+    mkdir -p $DOCKERVOL_SHORT $DOCKERLOG_SHORT
+    DOCKER_VOLUME_ROOT='/var/lib/docker/volumes'  # hard coded - check for your config if applicable!
+}
+
+
+_set_image_and_container_name() {
+    # IMGID qualifies image, container, user and IP adddress; this is helpful for managing
+    # processes on the docker host etc.
+    IMGID='49'  # range from 02 .. 99; must be unique per node (registered in github.com/identinetics/dscripts/templates/assigned-uids.adoc)
+    PROJSHORT='sshproxy'
+    SERVICEDESCRIPTION=ssh_proxy
+    export IMAGENAME="r2h2/${PROJSHORT}"  # [a-z_0-9]
+    export CONTAINERNAME="${PROJSHORT}"
+    export DOCKER_REGISTRY=''  # blank for index.docker.io
+}
+
+
+_set_users() {
+    export CONTAINERUID="3430${IMGID}"     # gid and uid for CONTAINERUSER
+    export START_AS_ROOT='True'       # ignored if unset or ''
+}
+
+
+_set_buildargs() {
+    export BUILDARGS="
+        --build-arg CONTAINERUID=$CONTAINERUID
+    "
+    export REPO_STATUS='True'  # if set: generate 'REPO_STATUS' file to be included in docker image
+}
+
+
+_set_run_args() {
+    export ENVSETTINGS="
+        -e CONTAINERUSER=$CONTAINERUSER
+    "
+    export STARTCMD=''  # set to override image default
+}
+
+
+create_intercontainer_network() {
+    export NETWORKSETTINGS="--net=host"
+}
+
+
+setup_vol_mapping() {
+    # Create docker volume (-> map_docker_volume) or map a host dir (-> map_host_directory)
+    # In both cases create a shortcut in the shortcut directory (DOCKERVOL_SHORT, DOCKERLOG_SHORT)
+    mode=$1  # create (used by run.sh)/list (used by manage.sh)
+    export VOLLIST=''
+    export VOLMAPPING=''
+    # create container user on docker host (optional - for better process visibility with host tools)
+    (($(id -u) == 0 )) && create_user $CONTAINERUSER $CONTAINERUID
+
+    # Hint: it is good practice to export each VOLUME in the Dockerfile
+    map_docker_volume $mode "${CONTAINERNAME}.opt_etc_ssh" '/opt/etc/ssh' 'Z' $DOCKERVOL_SHORT
+    map_docker_volume $mode "${CONTAINERNAME}.home_sshproxy" '/home/sshproxy' 'Z' $DOCKERVOL_SHORT
+}
+
+
+_set_logfiles() {  # optional: set this for multitail + logfiles subcommands in manage.sh
+    export KNOWN_LOGFILES=""
+}
+
+
+container_status() {
+    $sudo docker ps | head -1
+    $sudo docker ps --all | egrep $CONTAINERNAME\$
+    if [[ ${JENKINS_HOME} ]]; then
+        ttyopt=''
+    else
+        ttyopt='-t'
+    fi
+
+    $sudo docker exec -i $ttyopt $CONTAINERNAME /scripts/status.sh
+}
+
+
+main $@
