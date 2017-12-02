@@ -1,6 +1,6 @@
 # SSH Proxy
 
-Docker container to run a SSH daemon as a SOCKS proxy (or other proxy)
+Docker container to run a SSH daemon as a SOCKS proxy (or other TCP-proxy with a different client command)
 
 
 * Copy config (`cp conf.sh.default conf.sh`)
@@ -10,6 +10,6 @@ Docker container to run a SSH daemon as a SOCKS proxy (or other proxy)
 * Start sshd (`/opt/bin/start.sh`)
 * Test connection from client (`ssh -p 2022 <targethost>`)
 * Start sshd as daemon (`dscripts/run.sh -p`)
-* Script and autostart connection (`ssh -D 1080 -p 2022 <targethost>`)
+* Script and autostart connection (`ssh -N -D 127.0.0.1:1080 -p 2022 <targethost>`)
 
 
