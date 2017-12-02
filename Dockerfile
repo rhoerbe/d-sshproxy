@@ -24,8 +24,7 @@ RUN rm -f /etc/ssh/ssh_host_*_key \
  && echo 'GSSAPIAuthentication no' >> /opt/etc/ssh/sshd_config \
  && echo 'useDNS no' >> /opt/etc/ssh/sshd_config \
  && sed -i -e 's/#Port 22/Port 2022/' /opt/etc/ssh/sshd_config \
- && sed -i -e 's/^HostKey \/etc\/ssh\/ssh_host_/HostKey \/opt\/etc\/ssh\/ssh_host_/' /opt/etc/ssh/sshd_config \
- && chown -R $CONTAINERUSER:$CONTAINERGROUP /opt/etc
+ && sed -i -e 's/^HostKey \/etc\/ssh\/ssh_host_/HostKey \/opt\/etc\/ssh\/ssh_host_/' /opt/etc/ssh/sshd_config
 VOLUME /opt/etc/ssh
 EXPOSE 2022
 
