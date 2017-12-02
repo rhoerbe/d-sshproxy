@@ -1,7 +1,7 @@
 FROM centos:centos7
 LABEL maintainer="Rainer Hörbe <r2h2@hoerbe.at>" \
       version="0.1.0" \
-      capabilities='--cap-drop=all --cap-add=sys_chroot --cap-add=setgid --cap-add=setuid --cap-add=audit_write --cap-add=kill --cap-add=chown --cap-add=dac_override'# capabilities='--cap-drop=all --cap-add=sys_chroot --cap-add=setgid --cap-add=setuid --cap-add=audit_write --cap-add=audit_control --cap-add=kill'
+      capabilities='--cap-drop=all --cap-add=sys_chroot --cap-add=setgid --cap-add=setuid --cap-add=audit_write --cap-add=kill --cap-add=chown --cap-add=dac_override'# capabilities='--cap-drop=all --cap-add=sys_chroot --cap-add=setgid --cap-add=setuid --cap-add=audit_write --cap-add=audit_control --cap-add=kill --cap-add=chown --cap-add=dac_override'
 
 
 RUN yum -y update \

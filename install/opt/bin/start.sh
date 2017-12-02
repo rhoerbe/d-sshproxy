@@ -39,7 +39,7 @@ start_sshd() {
     if [[ "$daemonmode" == '-D' ]]; then
         echo 'starting sshd in foreground'
     fi
-    /usr/sbin/sshd ${daemonmode} -f /opt/etc/ssh/sshd_config
+    /usr/sbin/sshd ${daemonmode} $SSHD_OPTS -f /opt/etc/ssh/sshd_config
 }
 
 

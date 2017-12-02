@@ -54,13 +54,14 @@ _set_buildargs() {
 _set_run_args() {
     export ENVSETTINGS="
         -e CONTAINERUSER=$CONTAINERUSER
+        -e SSHD_OPTS=
     "
     export STARTCMD=''  # set to override image default
 }
 
 
 create_intercontainer_network() {
-    export NETWORKSETTINGS="--net=host"
+    export NETWORKSETTINGS="-p 2022:2022"
 }
 
 
